@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/mui.picker.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/mui.poppicker.css" />
+	</head>
+	<header class="mui-bar mui-bar-nav">
+		<h1 class="mui-title">发布新项目</h1>
+	</header>
+	<div id="" class="mui-content mui-content-padded">
+		<form class="mui-input-group">
+			<div class="mui-input-row">
+				<label>项目名</label>
+				<input id="projectname" type="text" class="mui-input-clear" placeholder="请输入项目名">
+			</div>
+			<div class="mui-input-row">
+				<label>封面路径</label>
+				<input id="projectpic" type="text" class="mui-input-clear" placeholder="请输入路径">
+			</div>
+			<div class="mui-input-row" style="line-height: 40px;">
+				<label>项目类别</label>
+				<span id="showUserPicker1">点击选择项目类别</span>
+				<!-- 			<input  type="text" class="mui-input-clear" placeholder="点击选择项目类别"> -->
+			</div>
+			<div class="mui-input-row" style="line-height: 40px;">
+				<label>项目图标</label>
+				<span id="showUserPicker2">点击选择项目图标</span>
+				<!-- <input id="showUserPicker2" type="text" class="mui-input-clear" placeholder="点击选择项目图标"> -->
+			</div>
+			<div class="mui-button-row">
+				<button id="subBtn" type="button" class="mui-btn mui-btn-primary" style="width: 6.25rem;">确认</button>
+			</div>
+		</form>
+
+	</div>
+
+
+	<nav class="mui-bar mui-bar-tab">
+		<a class="mui-tab-item" id="index">
+			<span class="mui-icon mui-icon-home"></span>
+			<span class="mui-tab-label">首页</span>
+		</a>
+		<a class="mui-tab-item mui-active" id="project">
+			<span class="mui-icon mui-icon-compose"></span>
+			<span class="mui-tab-label">发布</span>
+		</a>
+		<a class="mui-tab-item " id="my">
+			<span class="mui-icon mui-icon-person"></span>
+			<span class="mui-tab-label">我的</span>
+		</a>
+	</nav>
+	<body>
+		<script src="js/mui.min.js"></script>
+		<script src="js/mui.picker.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/mui.poppicker.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			mui.init()
+			getallclass()
+			getalicon()
+			document.getElementById('subBtn').addEventListener('tap',newproject)
+			function newproject() {
+				var projectpic = document.getElementById("projectpic").value;
+				var projectname = document.getElementById("projectname").value;
+				var projectclass = localStorage.getItem('projectclass');
+				localStorage.setItem('projectclass',null)
+				var projecticon = localStorage.getItem('projecticon');
+				localStorage.setItem('projecticon',null)
+				var userid = localStorage.getItem('uid')
+				var newInfo = {
+					projectname: projectname,
+					userid: userid,
+					projectpic: projectpic,
+					projectclass: projectclass,
+					projecticon: projecticon
+				};
+
+				if (newInfo.projectname.trim().length == 0) {
+					mui.toast("项目名不能为空!");
+					return;
+				} else if (newInfo.projectpic.trim().length == 0) {
+					mui.toast("路径不能为空!");
+					return;
+				} else if (newInfo.projectclass.trim().length == 0) {
+					mui.toast("请选择类别!");
+					return;
+				} else if (newInfo.projecticon.trim().length == 0) {
+					mui.toast("请选择图标!");
+					return;
+				} else {
+					//要提交的地址和参数
+					var url = 'https://www2.timuwork.com/post/project/new';
+					//调用MUI的ajax方法获取结果
+					// var that = this
+					mui.ajax(url, {
+						data: {
+							"projectname": newInfo.projectname,
+							"userid": newInfo.userid,
+							"projectpic": newInfo.projectpic,
+							"projectclass": newInfo.projectclass,
+							"projecticon": newInfo.projecticon
+						},
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						type: 'post',
+						timeout: 10000,
+						success: function(data) {
+							// console.log(that)
+							if (data !== 1) {
+								mui.toast('添加失败');
+							} else {
+								mui.toast('添加成功');
+								window.setTimeout(function() {
+									mui.openWindow({
+										url: 'project_issue.html'
+									});
+								}, 100)
+							}
+						},
+						error: function(xhr, type, errorThrown) {
+							mui.toast('Login failed, please check your internet.');
+						}
+					});
+				}
+			}
+
+			function showLevel1(data) {
+				var picker = new mui.PopPicker({
+					layer: 1,
+					buttons: ['取消', '确定']
+				});
+				picker.setData(data);
+				document.getElementById("showUserPicker1").addEventListener('tap', function(event) {
+					// document.getElementById("showUserPicker1").innerText='';
+					// 默认显示第1项
+					picker.pickers[0].setSelectedIndex(0, 2000);
+					picker.show(function(selectItems) {
+						var text = selectItems[0].text;
+						var value = selectItems[0].value;
+						localStorage.setItem('projectclass', value);
+						document.getElementById("showUserPicker1").innerText = text;
+					});
+				});
+			}
+
+			function getallclass() {
+				var url = 'https://www2.timuwork.com/post/common/getallclass'
+				mui.ajax(url, {
+					type: 'get',
+					success: function(data) {
+						// data = data.slice(0, 5)
+						var pickerData = []
+						data.map(function(item) {
+							var newitem = {}
+							newitem['value'] = item.postclassid
+							newitem['text'] = item.postclassname
+							pickerData.push(newitem)
+						})
+						showLevel1(pickerData)
+					},
+					error: function(xhr, type, errorThrown) {
+						mui.toast('Login failed, please check your internet.');
+					}
+				})
+			}
+
+			function getalicon() {
+				var url = 'https://www2.timuwork.com/post/common/getallicon'
+				mui.ajax(url, {
+					type: 'get',
+					success: function(data) {
+						console.log(data)
+						// data = data.slice(0, 5)
+						var pickerData = []
+						data.map(function(item) {
+							var newitem = {}
+							newitem['value'] = item.iconid
+							newitem['text'] = item.icontag
+							pickerData.push(newitem)
+						})
+						showLevel2(pickerData)
+					},
+					error: function(xhr, type, errorThrown) {
+						mui.toast('Login failed, please check your internet.');
+					}
+				})
+			}
+
+			function showLevel2(data) {
+				var picker = new mui.PopPicker({
+					layer: 1,
+					buttons: ['取消', '确定']
+				});
+				picker.setData(data);
+				document.getElementById("showUserPicker2").addEventListener('tap', function(event) {
+					// document.getElementById("showUserPicker1").innerText='';
+					// 默认显示第4项
+					picker.pickers[0].setSelectedIndex(0, 2000);
+					picker.show(function(selectItems) {
+						var text = selectItems[0].text;
+						var value = selectItems[0].value;
+						localStorage.setItem('projecticon', value);
+						document.getElementById("showUserPicker2").innerText = text;
+					});
+				});
+			}
+			/* 底部导航 */
+			document.getElementById('index').addEventListener('tap', function() {
+				mui.openWindow('index.html', 'index')
+			})
+			document.getElementById('project').addEventListener('tap', function() {
+				mui.openWindow('project_new.html', 'project')
+			})
+			document.getElementById('my').addEventListener('tap', function() {
+				mui.openWindow('my.html', 'my')
+			})
+		</script>
+	</body>
+
+</html>

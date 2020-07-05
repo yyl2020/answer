@@ -1,0 +1,33 @@
+.mui-row.mui-fullscreen>[class*="mui-col-"] {
+
+	height: 100%;
+	margin-bottom: 50px;
+}
+
+.mui-col-xs-3,
+.mui-col-xs-9 {
+	margin-top: 158px;
+	overflow-y: auto;
+}
+
+.mui-control-content {
+	display: block;
+}
+
+.mui-segmented-control .mui-control-item {
+	line-height: 50px;
+	width: 100%;
+}
+
+.mui-segmented-control.mui-segmented-control-inverted .mui-control-item.mui-active {
+	background-color: #fff;
+}
+.mui-card-content{
+	padding: 10px;
+}
+
+.mui-card {
+	padding: 10px;
+margin: 0;	
+	margin-bottom: 10px;
+}

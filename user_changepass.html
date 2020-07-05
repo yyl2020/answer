@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<style>
+			.area {
+			margin: 20px auto 0px auto;
+		}
+		.mui-input-group:first-child {
+			margin-top: 20px;
+		}
+		.mui-input-group label {
+			width: 22%;
+		}
+		.mui-input-row label~input,
+		.mui-input-row label~select,
+		.mui-input-row label~textarea {
+			width: 78%;
+		}
+		.mui-checkbox input[type=checkbox],
+		.mui-radio input[type=radio] {
+			top: 6px;
+		}
+		.mui-content-padded {
+			margin-top: 25px;
+		}
+		.mui-btn {
+			padding: 10px;
+		}
+		
+	</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">修改密码</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group">
+				<div class="mui-input-row">
+					<label>账号</label>
+					<input id='account' type="text" class="mui-input-clear mui-input" placeholder="请输入账号">
+				</div>
+				<div class="mui-input-row">
+					<label>旧密码</label>
+					<input id='old_password' type="password" class="mui-input-clear mui-input" placeholder="请输入旧密码">
+				</div>
+				<div class="mui-input-row">
+					<label>新密码</label>
+					<input id='new_password' type="password" class="mui-input-clear mui-input" placeholder="请输入新密码">
+				</div>
+			</form>
+			<div class="mui-content-padded">
+				<button id='reg' class="mui-btn mui-btn-block mui-btn-primary">确认修改</button>
+			</div>
+
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			var chageButton = document.getElementById('reg');
+			var accountBox = document.getElementById('account');
+			var oldPasswordBox = document.getElementById('old_password');
+			var newPasswordBox = document.getElementById('new_password');
+			chageButton.addEventListener('tap', function(event) {
+				var chageInfo = {
+					account: accountBox.value,
+					newPassword: newPasswordBox.value
+				};
+				var oldPassword = oldPasswordBox.value
+				if (chageInfo.account.trim().length == 0) {
+					mui.toast("用户名不能为空!");
+					return;
+				} else if(oldPassword.trim().length == 0){
+					mui.toast("密码不能为空!");
+					return;
+				}else if (chageInfo.newPassword.trim().length == 0) {
+					mui.toast("密码不能为空!");
+					return;
+				} else {
+
+					//要提交的地址和参数
+					var url = 'https://www2.timuwork.com/post/user/changepass';
+
+					//调用MUI的ajax方法获取结果
+					mui.ajax(url, {
+						data: {
+							"uname": chageInfo.account,
+							"upass": chageInfo.newPassword
+						},
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						type: 'post',
+						timeout: 10000,
+						success: function(data) {
+							console.log(data)
+							if (data !== 1) {
+								mui.toast('修改失败请确认用户名密码');
+							} else {
+								mui.toast('修改成功');
+								window.setTimeout(function(){
+									mui.openWindow({
+									    url: 'user_login.html'
+									});
+								},1000)
+							}
+						},
+						error: function(xhr, type, errorThrown) {
+							mui.toast('Login failed, please check your internet.');
+						}
+					});
+				}
+
+			})
+		</script>
+	</body>
+
+</html>

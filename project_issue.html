@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">添加问题</h1>
+		</header>
+		<div id="" class="mui-content mui-content-padded">
+			<form class="mui-input-group">
+				<div class="mui-input-row">
+					<label>题目标题</label>
+					<input id="questiontitle" type="text" class="mui-input-clear" placeholder="请输入标题">
+				</div>
+				<div class="mui-input-row">
+					<label>A选项</label>
+					<input id="optionsA" type="text" class="mui-input-clear" placeholder="请输入A选项">
+				</div>
+				<div class="mui-input-row">
+					<label>B选项</label>
+					<input id="optionsB" type="text" class="mui-input-clear" placeholder="请输入B选项">
+				</div>
+				<div class="mui-input-row">
+					<label>C选项</label>
+					<input id="optionsC" type="text" class="mui-input-clear" placeholder="请输入C选项">
+				</div>
+				<div class="mui-input-row">
+					<label>D选项</label>
+					<input id="optionsD" type="text" class="mui-input-clear" placeholder="请输入D选项">
+				</div>
+
+				<div class="mui-button-row" style="margin-top: 20px;">
+					<button id="subDone" type="button" class="mui-btn mui-btn-primary" style="width: 6.25rem;">完成</button>
+					<button id="subBtn" type="button" class="mui-btn mui-btn-primary" style="width: 6.25rem;margin-left: 50px;">添加</button>
+				</div>
+			</form>
+
+		</div>
+
+
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			document.getElementById('subBtn').addEventListener('tap',newproject)
+			document.getElementById('subDone').addEventListener('tap',function(){
+					mui.openWindow({
+						url: 'index.html',
+					});
+			})
+			function newproject() {
+				var optionsA = document.getElementById("optionsA").value;
+				var optionsB = document.getElementById("optionsB").value;
+				var optionsC = document.getElementById("optionsC").value;
+				var optionsD = document.getElementById("optionsD").value;
+				var questiontitle = document.getElementById("questiontitle").value;
+				var options = optionsA+"|"+optionsB+"|"+optionsC+"|"+optionsD;
+				var id = localStorage.getItem('id');
+				var newInfo = {
+					projectid: id, 
+					answers: options,
+					question: questiontitle
+				};
+
+				if (questiontitle.trim().length == 0) {
+					mui.toast("题目名不能为空!");
+					return;
+				} else {
+					//要提交的地址和参数
+					var url = 'https://www2.timuwork.com/post/content/new';
+					//调用MUI的ajax方法获取结果
+					// var that = this
+					mui.ajax(url, {
+						data: {
+							"projectid": newInfo.projectid,
+							"answers": newInfo.answers,
+							"question": newInfo.question
+						},
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						type: 'post',
+						timeout: 10000,
+						success: function(data) {
+							// console.log(that)
+							if (data !== 1) {
+								mui.toast('添加失败');
+
+							} else {
+								mui.toast('添加成功');
+								document.getElementById("optionsA").value = '';
+								document.getElementById("optionsB").value = '';
+								document.getElementById("optionsC").value= '';
+								document.getElementById("optionsD").value='';
+								document.getElementById("questiontitle").value='';
+								// window.setTimeout(function() {
+								// 	mui.openWindow({
+								// 		url: 'project_issue.html',
+								// 		// extras:{  
+								// 		//         id: ,  
+								// 		//  }  
+								// 	});
+								// }, 1000)
+							}
+						},
+						error: function(xhr, type, errorThrown) {
+							mui.toast('Login failed, please check your internet.');
+						}
+					});
+				}
+			}
+		</script>
+	</body>
+</html>

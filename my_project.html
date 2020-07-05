@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-card {
+				margin: 10px;
+			}
+
+			.mui-card-content {
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的项目</h1>
+		</header>
+		<div id="content" class="mui-content mui-content-padded">
+			<div style="position: relative;top:50px;left: 35%;">暂时没有项目</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			var url = 'https://www2.timuwork.com/post/project/getmy'
+			mui.ajax(url, {
+				type: 'post',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				data: {
+					"userid": localStorage.getItem('uid'),
+					"uname": localStorage.getItem('uname')
+				},
+				success: function(data) {
+					console.log(data)
+					var html2 = [];
+
+					if (!data) {
+						html2.push('<div>暂时没有项目</div>')
+					} else {
+						var n = data.length
+						for (j = 0; j < n; j++) {
+							html2.push('<div class="mui-card"  data-id="' + data[j].projectid +
+								'"><div class="mui-card-header"><img src="' + data[j].iconsrc +
+								'"><div class="mui-media-body">' + data[j].projectownername + '<p>发表于 ' + data[j].projectdate.slice(0, 10) +
+								"  " + data[j].projectdate.slice(11, 19) + '</p></div></div><div class="mui-card-content">' +
+								data[j].projectname + '</div><div class="mui-card-footer">当前参与人数：' + data[j].projectjoind + '</div></div>');
+						}
+						document.getElementById('content').innerHTML = html2.join('');
+						mui(".mui-content").on('tap', '.mui-card', function() {
+							var id = this.getAttribute("data-id");
+							console.log(id)
+							localStorage.setItem('id', id)
+							mui.openWindow({
+								id: 'detail_add.html',
+								url: 'detail_add.html',
+								extras:{
+									id:id
+								}
+							});
+						})
+					}
+					// renderList(data)
+				},
+				error: function(xhr, type, errorThrown) {
+					mui.toast('Login failed, please check your internet.');
+				}
+			})
+		</script>
+	</body>
+</html>
